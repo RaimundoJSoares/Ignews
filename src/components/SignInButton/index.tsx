@@ -4,9 +4,10 @@ import { FiX } from 'react-icons/fi';
 import { signIn, signOut, useSession } from 'next-auth/react'; //next-auth/client was renamed to next-auth/react in v4
 
 export function SignInButton() {
-  const { data: session} = useSession() //se o usuario tem uma sessão ativa ou não
+  const { data: session, status } = useSession(); //se o usuario tem uma sessão ativa ou não
+  if (status === 'loading') return <p>Loading...</p>;
 
-  return session ? (
+  return session? (
     
     <button type="button"
     className={styles.signInButton} 

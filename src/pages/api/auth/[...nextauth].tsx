@@ -1,7 +1,7 @@
-import { query as q } from "faunadb"
-import NextAuth from "next-auth"
-import GithubProvider from "next-auth/providers/github"
-import { fauna } from "../../../components/services/fauna"
+import { query as q } from "faunadb";
+import NextAuth from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+import { fauna } from "../../../components/services/fauna";
 
 export default NextAuth({
   // Configure one or more authentication providers
@@ -12,23 +12,24 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
+
   //callbacks: {
-   // async signIn({ user, account, profile, email, credentials }) {
-     // const isAllowedToSignIn = true
-    //  if (isAllowedToSignIn) {
-      //  return true
-     // } else {
-        // Return false to display a default error message
-      //  return false
-        // Or you can return a URL to redirect to:
-        // return '/unauthorized'
-    //  }
- //   }
+  // async signIn({ user, account, profile, email, credentials }) {
+  // const isAllowedToSignIn = true
+  //  if (isAllowedToSignIn) {
+  //  return true
+  // } else {
+  // Return false to display a default error message
+  //  return false
+  // Or you can return a URL to redirect to:
+  // return '/unauthorized'
+  //  }
+  //   }
 
   //}
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       const { email } = user;
 
       try {
@@ -36,28 +37,17 @@ export default NextAuth({
           q.If(
             q.Not(
               q.Exists(
-                q.Match(
-                  q.Index('user_by_email'),
-                  q.Casefold(user.email)
-                )
+                q.Match(q.Index("user_by_email"), q.Casefold(user.email))
               )
             ),
-            q.Create(
-              q.Collection('users'),
-              { data : { email }}
-            ),
-            q.Get(
-              q.Match(
-                q.Index('user_by_email'),
-                q.Casefold(user!.email)
-              )
-            )
+            q.Create(q.Collection("users"), { data: { email } }),
+            q.Get(q.Match(q.Index("user_by_email"), q.Casefold(user!.email)))
           )
-        )
-        return true }
-       catch {
-        return false
+        );
+        return true;
+      } catch {
+        return false;
       }
-      },
     },
-})
+  },
+});
